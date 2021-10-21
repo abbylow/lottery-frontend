@@ -9,7 +9,8 @@ class App extends React.Component {
     players: [],
     balance: '',
     value: '',
-    message: ''
+    message: '',
+    lastWinner: ''
   };
 
   async componentDidMount() {
@@ -40,6 +41,20 @@ class App extends React.Component {
     this.setState({ message: 'You have been entered! ' });
   }
 
+  onClick = async() => {
+    const accounts = await web3.eth.getAccounts();
+
+    this.setState({ message: 'Waiting on transaction success...' });
+    
+    await lottery.methods.pickWinner().send({
+      from: accounts[0]
+    });
+
+    const lastWinner = await lottery.methods.lastWinner().call();
+
+    this.setState({ message: `The winner is ${lastWinner}` });
+  }
+
   render() {
     return (
       <div>
@@ -65,6 +80,11 @@ class App extends React.Component {
             Enter
           </button>
         </form>
+
+        <hr />
+
+        <h4>Ready to pick a winner? </h4>
+        <button onClick={this.onClick}>Pick a winner!</button>
 
         <hr />
 
