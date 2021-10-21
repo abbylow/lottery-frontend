@@ -10,7 +10,8 @@ class App extends React.Component {
     balance: '',
     value: '',
     message: '',
-    lastWinner: ''
+    lastWinner: '',
+    isManager: false,
   };
 
   async componentDidMount() {
@@ -18,11 +19,13 @@ class App extends React.Component {
     const manager = await lottery.methods.manager().call();
     const players = await lottery.methods.getPlayers().call();
     const balance = await web3.eth.getBalance(lottery.options.address);
+    const accounts = await web3.eth.getAccounts();
 
     this.setState({ 
       manager,
       players,
-      balance
+      balance,
+      isManager: manager === accounts[0]
     });
   }
 
@@ -82,11 +85,15 @@ class App extends React.Component {
         </form>
 
         <hr />
-
-        <h4>Ready to pick a winner? </h4>
-        <button onClick={this.onClick}>Pick a winner!</button>
-
-        <hr />
+        {
+          this.state.isManager && (
+            <>
+              <h4>Ready to pick a winner? </h4>
+              <button onClick={this.onClick}>Pick a winner!</button>
+              <hr />
+            </>
+          )
+        }
 
         <h1>{this.state.message}</h1>
 
